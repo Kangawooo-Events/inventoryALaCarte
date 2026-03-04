@@ -1,0 +1,4 @@
+name: inventoryALaCarte
+version: '1.0-SNAPSHOT'
+main: me.titruc.inventoryALaCarte.InventoryALaCarte
+api-version: '1.21'
