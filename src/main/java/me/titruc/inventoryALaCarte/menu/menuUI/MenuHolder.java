@@ -1,4 +1,4 @@
-package me.titruc.inventoryALaCarte.inventoryHandler;
+package me.titruc.inventoryALaCarte.menu.menuUI;
 
 import me.titruc.inventoryALaCarte.InventoryALaCarte;
 import org.bukkit.entity.Player;
