@@ -5,6 +5,7 @@ import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableCondition;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableEvent;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableCondition.IsOpCondition;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableEvent.CloseMenuEvent;
+import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableEvent.SendMessage;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import me.titruc.inventoryALaCarte.register.Register;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -65,6 +66,7 @@ public final class InventoryALaCarte extends JavaPlugin {
     private void registerBuiltInClickableEvent()
     {
         clickableEventRegister.register("close", new CloseMenuEvent());
+        clickableEventRegister.register("send_message", new SendMessage());
     }
 
     private void registerBuiltInClickableCondition()
