@@ -1,0 +1,4 @@
+menu_settings:
+  default_name : "menu"
+  defaultMenuBold : false
+  defaultGenericMenuRow : 3

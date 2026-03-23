@@ -1,33 +1,40 @@
 package me.titruc.inventoryALaCarte.menu.menuLoader;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import org.bukkit.plugin.Plugin;
+import me.titruc.inventoryALaCarte.menu.menuLoader.loader.MenuLoader;
+import me.titruc.inventoryALaCarte.menu.menuLoader.loader.layout.GenericMenuLoader;
+import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import java.io.File;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class MenuFactory {
 
-    private static final Gson GSON = new Gson();
+    public static MenuHolder createFromFile(File file) {
 
-    public static <T> T read(Plugin plugin, String fileName, Type type) {
-        Path path = Paths.get(plugin.getDataFolder() + "/" + fileName + ".json");
+        if (!file.exists()) return null;
 
-        try
-        {
-            BufferedReader bufferedReader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-            JsonReader jsonReader = new JsonReader(bufferedReader);
-            return GSON.fromJson(jsonReader, type);
+        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+        String type = config.getString("type");
+        if (type == null) return null;
+
+        MenuLoader loader;
+        switch (type) {
+            case "generic" :
+                loader = new GenericMenuLoader();
+                break;
+            default :
+                return null;
         }
-        catch (IOException e)
-        {
-            return null;
-        }
+
+        return loader.load(config);
     }
+
+    public static MenuHolder createFromPath(String path)
+    {
+        File file = new File(path);
+        return createFromFile(file);
+    }
+
 }
