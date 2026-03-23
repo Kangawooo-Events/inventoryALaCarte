@@ -1,7 +1,6 @@
 package me.titruc.inventoryALaCarte.menu.menuLoader.loader;
 
 import me.titruc.inventoryALaCarte.ConfigHandler;
-import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableEvent;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -61,26 +60,48 @@ public abstract class MenuLoader
 
 
 
-            if(rawItem.containsKey("click")) {
+            if (rawItem.containsKey("click")) {
                 Object rawClick = rawItem.get("click");
 
-                if(rawClick instanceof Map) {
-                    String clickableEventName = (String) ((Map<?, ?>) rawClick).get("action");
-                    Map<String, Object> parameter = getParameterMap((Map<String, Object>) rawItem.get("parameter"));
-                    menu.addMenuAction(slot, clickableEventName, parameter);
+                if (rawClick instanceof Map<?, ?> clickMapRaw) {
+
+                    Map<String, Object> clickMap = new HashMap<>();
+                    for (Map.Entry<?, ?> e : clickMapRaw.entrySet()) {
+                        clickMap.put(e.getKey().toString(), e.getValue());
+                    }
+
+                    String clickableEventName = (String) clickMap.get("action");
+
+                    Map<String, Object> parameter =
+                            getParameterMap(clickMap.get("parameter"));
+
+                    Map<String, Map<String, Object>> rawConditions =
+                            getConditionsMap(clickMap.get("conditions"));
+
+                    menu.addMenuAction(slot, clickableEventName, parameter, rawConditions);
                 }
 
-                else if(rawClick instanceof List) {
-                    List<Map<String, Object>> clicks = (List<Map<String, Object>>) rawClick;
+                else if (rawClick instanceof List<?> clicksRaw) {
 
-                    for(Map<String, Object> click : clicks) {
-                        String clickableEventName = (String) ((Map<?, ?>) click).get("action");
-                        Map<String, Object> parameter = getParameterMap((Map<String, Object>) click.get("parameter"));
-                        menu.addMenuAction(slot, clickableEventName, parameter);
+                    for (Object entry : clicksRaw) {
+                        if (!(entry instanceof Map<?, ?> clickMapRaw)) continue;
+
+                        Map<String, Object> clickMap = new HashMap<>();
+                        for (Map.Entry<?, ?> e : clickMapRaw.entrySet()) {
+                            clickMap.put(e.getKey().toString(), e.getValue());
+                        }
+
+                        String clickableEventName = (String) clickMap.get("action");
+
+                        Map<String, Object> parameter =
+                                getParameterMap(clickMap.get("parameter"));
+
+                        Map<String, Map<String, Object>> rawConditions =
+                                getConditionsMap(clickMap.get("conditions"));
+
+                        menu.addMenuAction(slot, clickableEventName, parameter, rawConditions);
                     }
                 }
-
-
             }
 
             item.setItemMeta(meta);
@@ -112,27 +133,53 @@ public abstract class MenuLoader
         return paramsMap;
     }
 
-    public static List<Map<String, Object>> getConditionsMap(Object conditionObj) {
-        Map<String, Map<String, Object>> conditionsMap = new HashMap<>();
+    public static Map<String, Map<String, Object>> getConditionsMap(Object conditionObj) {
+        Map<String, Map<String, Object>> conditions = new HashMap<>();
 
-        if (conditionObj == null) return conditionsMap;
+        if (conditionObj == null) return conditions;
 
-        if (conditionObj instanceof Map<?, ?> map) {
-            for (Map.Entry<?, ?> e : map.entrySet()) {
-                paramsMap.put(e.getKey().toString(), e.getValue());
-            }
-        }
-
-        else if (paramObj instanceof List<?> list) {
+        if (conditionObj instanceof List<?> list) {
             for (Object entry : list) {
-                if (entry instanceof Map<?, ?> mapEntry) {
-                    for (Map.Entry<?, ?> e : mapEntry.entrySet()) {
-                        paramsMap.put(e.getKey().toString(), e.getValue());
+                if (!(entry instanceof Map<?, ?> mapEntry)) continue;
+
+                Map<String, Object> conditionArgs = new HashMap<>();
+                String type = null;
+
+                for (Map.Entry<?, ?> e : mapEntry.entrySet()) {
+                    String key = e.getKey().toString();
+
+                    if (key.equals("type")) {
+                        type = e.getValue().toString();
+                    } else {
+                        conditionArgs.put(key, e.getValue());
                     }
+                }
+
+                if (type != null) {
+                    conditions.put(type, conditionArgs);
                 }
             }
         }
 
-        return paramsMap;
+        else if (conditionObj instanceof Map<?, ?> mapEntry) {
+            Map<String, Object> conditionArgs = new HashMap<>();
+            String type = null;
+
+            for (Map.Entry<?, ?> e : mapEntry.entrySet()) {
+                String key = e.getKey().toString();
+
+                if (key.equals("type")) {
+                    type = e.getValue().toString();
+                } else {
+                    conditionArgs.put(key, e.getValue());
+                }
+            }
+
+            if (type != null) {
+                conditions.put(type, conditionArgs);
+            }
+        }
+
+        return conditions;
     }
 }

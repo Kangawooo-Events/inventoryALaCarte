@@ -5,6 +5,7 @@ import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Map;
 
 public class MenuAction {
@@ -22,6 +23,13 @@ public class MenuAction {
         }
         public void execute(Player player, MenuHolder menu, ItemStack item)
         {
+            for (String conditionName : conditions.keySet()) {
+                if (InventoryALaCarte.clickableConditionRegister.has(conditionName)) {
+                    if(!InventoryALaCarte.clickableConditionRegister.getFromKey(conditionName).test(player, menu, item, conditions.get(conditionName)))
+                        return;
+                }
+            }
+
             if(InventoryALaCarte.clickableEventRegister.has(clickEventName))
             {
                 InventoryALaCarte.clickableEventRegister.getFromKey(clickEventName).execute(player, menu, item, parameter);

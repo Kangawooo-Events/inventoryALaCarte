@@ -3,6 +3,7 @@ package me.titruc.inventoryALaCarte;
 import me.titruc.inventoryALaCarte.listener.MenuListener;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableCondition;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableEvent;
+import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableCondition.IsOpCondition;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableEvent.CloseMenuEvent;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import me.titruc.inventoryALaCarte.register.Register;
@@ -45,8 +46,9 @@ public final class InventoryALaCarte extends JavaPlugin {
         //Listener
         getServer().getPluginManager().registerEvents(new MenuListener(),this);
 
-        //register built in clickable event
+        //register built in clickable event and condition
         registerBuiltInClickableEvent();
+        registerBuiltInClickableCondition();
     }
 
     @Override
@@ -63,5 +65,10 @@ public final class InventoryALaCarte extends JavaPlugin {
     private void registerBuiltInClickableEvent()
     {
         clickableEventRegister.register("close", new CloseMenuEvent());
+    }
+
+    private void registerBuiltInClickableCondition()
+    {
+        clickableConditionRegister.register("is_op", new IsOpCondition());
     }
 }
