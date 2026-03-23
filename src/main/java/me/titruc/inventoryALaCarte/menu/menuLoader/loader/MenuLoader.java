@@ -1,6 +1,7 @@
 package me.titruc.inventoryALaCarte.menu.menuLoader.loader;
 
 import me.titruc.inventoryALaCarte.ConfigHandler;
+import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableConditionEntry;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -9,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +59,7 @@ public abstract class MenuLoader
 
             if(rawItem.containsKey("name")) meta.displayName(Component.text((String) rawItem.get("name")));
             if(rawItem.containsKey("lore")) meta.lore(((List<String>) rawItem.get("lore")).stream().map(Component::text).toList());
-
-
+            if(rawItem.containsKey("amount")) item.setAmount(((int) rawItem.get("amount")));
 
             if (rawItem.containsKey("click")) {
                 Object rawClick = rawItem.get("click");
@@ -75,8 +76,8 @@ public abstract class MenuLoader
                     Map<String, Object> parameter =
                             getParameterMap(clickMap.get("parameter"));
 
-                    Map<String, Map<String, Object>> rawConditions =
-                            getConditionsMap(clickMap.get("conditions"));
+                    List<ClickableConditionEntry> rawConditions =
+                            getConditions(clickMap.get("conditions"));
 
                     menu.addMenuAction(slot, clickableEventName, parameter, rawConditions);
                 }
@@ -96,8 +97,8 @@ public abstract class MenuLoader
                         Map<String, Object> parameter =
                                 getParameterMap(clickMap.get("parameter"));
 
-                        Map<String, Map<String, Object>> rawConditions =
-                                getConditionsMap(clickMap.get("conditions"));
+                        List<ClickableConditionEntry> rawConditions =
+                                getConditions(clickMap.get("conditions"));
 
                         menu.addMenuAction(slot, clickableEventName, parameter, rawConditions);
                     }
@@ -133,8 +134,8 @@ public abstract class MenuLoader
         return paramsMap;
     }
 
-    public static Map<String, Map<String, Object>> getConditionsMap(Object conditionObj) {
-        Map<String, Map<String, Object>> conditions = new HashMap<>();
+    public static List<ClickableConditionEntry> getConditions(Object conditionObj) {
+        List<ClickableConditionEntry> conditions = new ArrayList<>();
 
         if (conditionObj == null) return conditions;
 
@@ -142,41 +143,28 @@ public abstract class MenuLoader
             for (Object entry : list) {
                 if (!(entry instanceof Map<?, ?> mapEntry)) continue;
 
-                Map<String, Object> conditionArgs = new HashMap<>();
+                Map<String, Object> params = new HashMap<>();
                 String type = null;
+                String logic = "AND";
+                boolean not = false;
 
                 for (Map.Entry<?, ?> e : mapEntry.entrySet()) {
                     String key = e.getKey().toString();
 
                     if (key.equals("type")) {
                         type = e.getValue().toString();
+                    } else if (key.equals("logic")) {
+                        logic = e.getValue().toString();
+                    } else if (key.equals("not")) {
+                        not = Boolean.parseBoolean(e.getValue().toString());
                     } else {
-                        conditionArgs.put(key, e.getValue());
+                        params.put(key, e.getValue());
                     }
                 }
 
                 if (type != null) {
-                    conditions.put(type, conditionArgs);
+                    conditions.add(new ClickableConditionEntry(type, params, logic, not));
                 }
-            }
-        }
-
-        else if (conditionObj instanceof Map<?, ?> mapEntry) {
-            Map<String, Object> conditionArgs = new HashMap<>();
-            String type = null;
-
-            for (Map.Entry<?, ?> e : mapEntry.entrySet()) {
-                String key = e.getKey().toString();
-
-                if (key.equals("type")) {
-                    type = e.getValue().toString();
-                } else {
-                    conditionArgs.put(key, e.getValue());
-                }
-            }
-
-            if (type != null) {
-                conditions.put(type, conditionArgs);
             }
         }
 

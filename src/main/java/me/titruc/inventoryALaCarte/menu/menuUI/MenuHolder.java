@@ -1,6 +1,7 @@
 package me.titruc.inventoryALaCarte.menu.menuUI;
 
 import me.titruc.inventoryALaCarte.InventoryALaCarte;
+import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableConditionEntry;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableEvent;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.MenuAction;
 import net.kyori.adventure.text.Component;
@@ -70,7 +71,7 @@ public class MenuHolder implements InventoryHolder {
         }
     }
 
-    public void addMenuAction(int slot, String clickableEventName, Map<String, Object> parameter, Map<String, Map<String, Object>> conditions)
+    public void addMenuAction(int slot, String clickableEventName, Map<String, Object> parameter, List<ClickableConditionEntry> conditions)
     {
         actions.computeIfAbsent(slot, k -> new ArrayList<>())
                 .add(new MenuAction(clickableEventName, parameter, conditions));

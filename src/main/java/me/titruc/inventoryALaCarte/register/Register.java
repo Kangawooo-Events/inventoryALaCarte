@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Register<T> {
 
-    private final HashMap<String, T> data;
+    public final HashMap<String, T> data;
 
     public Register() {
         data = new HashMap<>();
