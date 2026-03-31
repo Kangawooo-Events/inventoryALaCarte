@@ -26,7 +26,7 @@ public final class InventoryALaCarte extends JavaPlugin {
 
     //register for clickable event and menu
     public static final Register<MenuHolder> menuRegister = new Register<>();
-    public static final Register<ClickableEvent> clickableEventRegister = new Register<>();
+    public static final Register<ClickableEvent> clickableEventRegister = new Register<ClickableEvent>();
     public static final Register<ClickableCondition> clickableConditionRegister = new Register<>();
 
     @Override

@@ -1,8 +1,7 @@
 package me.titruc.inventoryALaCarte.menu.menuUI;
 
 import me.titruc.inventoryALaCarte.InventoryALaCarte;
-import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableConditionEntry;
-import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickableEvent;
+import me.titruc.inventoryALaCarte.menu.clickableEvent.ClickStep;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.MenuAction;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -11,7 +10,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +23,12 @@ public class MenuHolder implements InventoryHolder {
     private final int columns;
     private final InventoryType type;
     private Component title = Component.empty();
-    private final Map<Integer, List<MenuAction>> actions = new HashMap<>();
+    private final Map<Integer, MenuAction> actions = new HashMap<>();
 
     public MenuHolder(int rows, int columns, InventoryType invType) {
         this.rows = rows;
         this.columns = columns;
         this.type = invType;
-
         createInventory();
     }
 
@@ -62,18 +59,14 @@ public class MenuHolder implements InventoryHolder {
     }
 
     public void handleClick(int slot, Player player) {
-        List<MenuAction> actionList = actions.get(slot);
-
-        if (actionList != null) {
-            for (MenuAction action : actionList) {
-                action.execute(player, this, inventory.getItem(slot));
-            }
+        MenuAction action = actions.get(slot);
+        if (action != null) {
+            action.execute(player, this, inventory.getItem(slot));
         }
     }
 
-    public void addMenuAction(int slot, String clickableEventName, Map<String, Object> parameter, List<ClickableConditionEntry> conditions)
-    {
-        actions.computeIfAbsent(slot, k -> new ArrayList<>())
-                .add(new MenuAction(clickableEventName, parameter, conditions));
+
+    public void addMenuAction(int slot, List<ClickStep> steps) {
+        actions.put(slot, new MenuAction(steps));
     }
 }
