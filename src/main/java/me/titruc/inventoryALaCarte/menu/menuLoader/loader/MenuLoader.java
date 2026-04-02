@@ -5,8 +5,10 @@ import me.titruc.inventoryALaCarte.ConfigHandler;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.*;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.actionStep.SimpleActionStep;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -72,6 +74,17 @@ public abstract class MenuLoader {
         }
         if (section.contains("amount")) {
             item.setAmount(section.getInt("amount"));
+        }
+        if (section.contains("model")) {
+            String model = section.getString("model");
+
+            String[] split = model.split(":");
+            NamespacedKey key = new NamespacedKey(split[0], split[1]);
+
+            meta.setItemModel(key);
+        }
+        if (section.contains("customModelData")) {
+            meta.setCustomModelData(section.getInt("customModelData"));
         }
 
         item.setItemMeta(meta);
