@@ -25,13 +25,13 @@ public class StatementStep implements ClickStep {
 
     @Override
     public void execute(Player player, MenuHolder menu, ItemStack item) {
-        // Try if
+
         if (ifBranch.test(player, menu, item)) {
             ifBranch.execute(player, menu, item);
             return;
         }
 
-        // Try each else_if in order
+
         for (ConditionalBranch branch : elseIfBranches) {
             if (branch.test(player, menu, item)) {
                 branch.execute(player, menu, item);
@@ -39,7 +39,7 @@ public class StatementStep implements ClickStep {
             }
         }
 
-        // Fallback to else
+
         for (ClickStep action : elseBranch) {
             action.execute(player, menu, item);
         }

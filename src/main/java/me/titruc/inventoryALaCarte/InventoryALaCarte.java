@@ -7,13 +7,12 @@ import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableCondition
 import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableEvent.CloseMenuEvent;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.builtinClickableEvent.SendMessage;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
+import me.titruc.inventoryALaCarte.register.ItemRegistry;
 import me.titruc.inventoryALaCarte.register.Register;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Map;
 
 public final class InventoryALaCarte extends JavaPlugin {
 
@@ -28,6 +27,7 @@ public final class InventoryALaCarte extends JavaPlugin {
     public static final Register<MenuHolder> menuRegister = new Register<>();
     public static final Register<ClickableEvent> clickableEventRegister = new Register<ClickableEvent>();
     public static final Register<ClickableCondition> clickableConditionRegister = new Register<>();
+    public static final ItemRegistry itemRegistry = new ItemRegistry();
 
     @Override
     public void onEnable() {

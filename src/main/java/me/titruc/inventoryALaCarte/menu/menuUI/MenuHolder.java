@@ -33,6 +33,8 @@ public class MenuHolder implements InventoryHolder {
     }
 
     private void createInventory() {
+        if (type == InventoryType.MERCHANT) return;
+
         if (type == InventoryType.CHEST) {
             inventory = InventoryALaCarte.singleton
                     .getServer()
@@ -47,6 +49,11 @@ public class MenuHolder implements InventoryHolder {
     public void setTitle(Component title) {
         this.title = title;
         createInventory();
+    }
+
+
+    public Component getTitle() {
+        return this.title;
     }
 
     public void showInventory(Player player) {

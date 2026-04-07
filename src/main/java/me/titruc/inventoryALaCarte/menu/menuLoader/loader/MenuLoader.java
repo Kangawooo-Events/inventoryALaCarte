@@ -5,7 +5,6 @@ import me.titruc.inventoryALaCarte.ConfigHandler;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.*;
 import me.titruc.inventoryALaCarte.menu.clickableEvent.actionStep.SimpleActionStep;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -44,50 +43,54 @@ public abstract class MenuLoader {
 
     private void parseItem(MenuHolder menu, ConfigurationSection section, String itemKey) {
 
-
         if (!section.contains("slot")) {
-            warn("Item \"" + itemKey + "\" : required field :  \"slot\" not there, item is ignored.");
+            warn("Item \"" + itemKey + "\" : required field : \"slot\" not there, item is ignored.");
             return;
         }
         int slot = section.getInt("slot");
 
+        ItemStack item;
 
-        String materialName = section.getString("material");
-        if (materialName == null) {
-            warn("Item \"" + itemKey + "\" : required field :  \"material\" not there, item is ignored.");
-            return;
-        }
-        Material material = Material.matchMaterial(materialName);
-        if (material == null) {
-            warn("Item \"" + itemKey + "\" : Unknown Material \"" + materialName + "\", item is ignored.");
-            return;
+        if (section.contains("item_key")) {
+            // --- item depuis le registre ---
+            String registryKey = section.getString("item_key");
+
+            if (!InventoryALaCarte.itemRegistry.has(registryKey)) {
+                warn("Item \"" + itemKey + "\" : unknown item_key \"" + registryKey + "\", item is ignored.");
+                return;
+            }
+
+            item = InventoryALaCarte.itemRegistry.get(registryKey);
+
+        } else {
+            // --- item depuis un material ---
+            String materialName = section.getString("material");
+            if (materialName == null) {
+                warn("Item \"" + itemKey + "\" : required field : \"material\" not there, item is ignored.");
+                return;
+            }
+            Material material = Material.matchMaterial(materialName);
+            if (material == null) {
+                warn("Item \"" + itemKey + "\" : Unknown Material \"" + materialName + "\", item is ignored.");
+                return;
+            }
+
+            item = new ItemStack(material);
+            ItemMeta meta = item.getItemMeta();
+
+            if (section.contains("name")) meta.displayName(Component.text(section.getString("name")));
+            if (section.contains("lore")) meta.lore(section.getStringList("lore").stream().map(Component::text).toList());
+            if (section.contains("model")) {
+                String[] split = section.getString("model").split(":");
+                meta.setItemModel(new NamespacedKey(split[0], split[1]));
+            }
+            if (section.contains("customModelData")) meta.setCustomModelData(section.getInt("customModelData"));
+
+            item.setItemMeta(meta);
         }
 
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
+        if (section.contains("amount")) item.setAmount(section.getInt("amount"));
 
-        if (section.contains("name")) {
-            meta.displayName(Component.text(section.getString("name")));
-        }
-        if (section.contains("lore")) {
-            meta.lore(section.getStringList("lore").stream().map(Component::text).toList());
-        }
-        if (section.contains("amount")) {
-            item.setAmount(section.getInt("amount"));
-        }
-        if (section.contains("model")) {
-            String model = section.getString("model");
-
-            String[] split = model.split(":");
-            NamespacedKey key = new NamespacedKey(split[0], split[1]);
-
-            meta.setItemModel(key);
-        }
-        if (section.contains("customModelData")) {
-            meta.setCustomModelData(section.getInt("customModelData"));
-        }
-
-        item.setItemMeta(meta);
         menu.getInventory().setItem(slot, item);
 
         if (!section.contains("click")) return;
@@ -196,7 +199,7 @@ public abstract class MenuLoader {
         return new StatementStep(ifBranch, elseIfBranches, elseBranch);
     }
 
-    @SuppressWarnings("unchecked")
+
     private ConditionalBranch parseConditionalBranch(
             Map<String, Object> branchMap, String context, boolean conditionsRequired
     ) {

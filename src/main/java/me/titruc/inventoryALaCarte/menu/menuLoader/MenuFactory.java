@@ -2,6 +2,7 @@ package me.titruc.inventoryALaCarte.menu.menuLoader;
 
 import me.titruc.inventoryALaCarte.menu.menuLoader.loader.MenuLoader;
 import me.titruc.inventoryALaCarte.menu.menuLoader.loader.layout.GenericMenuLoader;
+import me.titruc.inventoryALaCarte.menu.menuLoader.loader.layout.MerchantMenuLoader;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -23,6 +24,9 @@ public class MenuFactory {
         switch (type) {
             case "generic" :
                 loader = new GenericMenuLoader();
+                break;
+            case "merchant" :
+                loader = new MerchantMenuLoader();
                 break;
             default :
                 return null;

@@ -24,23 +24,23 @@ public class ConditionalBranch {
 
         for (ClickableConditionEntry entry : conditions) {
 
-            if (!InventoryALaCarte.clickableConditionRegister.has(entry.type))
+            if (!InventoryALaCarte.clickableConditionRegister.has(entry.type()))
             {
-                InventoryALaCarte.singleton.getLogger().warning("Unknow Action : \"" + entry.type + "\" — maybe a typo ?");
+                InventoryALaCarte.singleton.getLogger().warning("Unknow Action : \"" + entry.type() + "\" — maybe a typo ?");
                 continue;
             }
 
             boolean test = InventoryALaCarte.clickableConditionRegister
-                    .getFromKey(entry.type)
-                    .test(player, menu, item, entry.params);
+                    .getFromKey(entry.type())
+                    .test(player, menu, item, entry.params());
 
 
-            if (entry.not) test = !test;
+            if (entry.not()) test = !test;
 
             if (result == null) {
                 result = test;
             } else {
-                switch (entry.logic.toUpperCase()) {
+                switch (entry.logic().toUpperCase()) {
                     case "OR"  -> result = result || test;
                     case "NOR" -> result = !(result || test);
                     default    -> result = result && test; // AND (default)
