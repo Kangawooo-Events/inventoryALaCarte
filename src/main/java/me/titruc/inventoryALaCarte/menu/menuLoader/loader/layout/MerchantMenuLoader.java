@@ -1,6 +1,7 @@
 package me.titruc.inventoryALaCarte.menu.menuLoader.loader.layout;
 
 import me.titruc.inventoryALaCarte.InventoryALaCarte;
+import me.titruc.inventoryALaCarte.menu.ConfigValidator;
 import me.titruc.inventoryALaCarte.menu.menuLoader.loader.MenuLoader;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import me.titruc.inventoryALaCarte.menu.menuUI.layout.MenuMerchant;
@@ -22,27 +23,20 @@ public class MerchantMenuLoader extends MenuLoader {
     protected MenuHolder createMenu(FileConfiguration config) {
         MenuMerchant menu = new MenuMerchant();
 
-        if (config.contains("items")) {
-            log.warning("[InventoryALaCarte] [MerchantMenu] 'items' field will be ignored with merchant type.");
-        }
-
-        if (!config.contains("trades")) {
-            log.severe("[InventoryALaCarte] [MerchantMenu] 'trades' field is required for merchant type.");
-            return null;
-        }
+         if (ConfigValidator.of(config, this.getClass().getCanonicalName())
+                .ignored("items", "'items' field will be ignored with merchant type.")
+                .requiredNonEmpty("trades")
+                .validate())
+             return null;
 
         List<Map<?, ?>> rawTrades = config.getMapList("trades");
-
-        if (rawTrades.isEmpty()) {
-            log.severe("[InventoryALaCarte] [MerchantMenu] 'trades' field is required for merchant type (list is empty).");
-            return null;
-        }
-
         List<MerchantRecipe> recipes = new ArrayList<>();
 
         for (int i = 0; i < rawTrades.size(); i++) {
             Map<?, ?> rawTrade = rawTrades.get(i);
             String tradeId = "trade[" + i + "]";
+
+
 
             if (!rawTrade.containsKey("result") && !rawTrade.containsKey("result_key")) {
                 log.severe("[InventoryALaCarte] [MerchantMenu] " + tradeId + " is missing required field 'result' or 'result_key'. Trade skipped.");
