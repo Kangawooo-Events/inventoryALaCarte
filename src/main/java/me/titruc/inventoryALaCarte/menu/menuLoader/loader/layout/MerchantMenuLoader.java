@@ -1,10 +1,10 @@
 package me.titruc.inventoryALaCarte.menu.menuLoader.loader.layout;
 
 import me.titruc.inventoryALaCarte.InventoryALaCarte;
-import me.titruc.inventoryALaCarte.menu.ConfigValidator;
 import me.titruc.inventoryALaCarte.menu.menuLoader.loader.MenuLoader;
 import me.titruc.inventoryALaCarte.menu.menuUI.MenuHolder;
 import me.titruc.inventoryALaCarte.menu.menuUI.layout.MenuMerchant;
+import me.titruc.inventoryALaCarte.menu.validator.ConfigValidator;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -23,7 +23,7 @@ public class MerchantMenuLoader extends MenuLoader {
     protected MenuHolder createMenu(FileConfiguration config) {
         MenuMerchant menu = new MenuMerchant();
 
-         if (ConfigValidator.of(config, this.getClass().getCanonicalName())
+         if (!ConfigValidator.of(config, this.getClass().getCanonicalName())
                 .ignored("items", "'items' field will be ignored with merchant type.")
                 .requiredNonEmpty("trades")
                 .validate())
@@ -38,24 +38,20 @@ public class MerchantMenuLoader extends MenuLoader {
 
 
 
-            if (!rawTrade.containsKey("result") && !rawTrade.containsKey("result_key")) {
-                log.severe("[InventoryALaCarte] [MerchantMenu] " + tradeId + " is missing required field 'result' or 'result_key'. Trade skipped.");
+            if(!ConfigValidator.of(rawTrade, this.getClass().getCanonicalName())
+                    .requireOneOfWithMessage(tradeId + " is missing required field 'result' or 'result_key'. Trade skipped.", "result", "result_key")
+                    .required("ingredient1")
+                    .validate())
                 continue;
-            }
-            if (!rawTrade.containsKey("ingredient1")) {
-                log.severe("[InventoryALaCarte] [MerchantMenu] " + tradeId + " is missing required field 'ingredient1'. Trade skipped.");
-                continue;
-            }
 
-            int resultAmount    = rawTrade.containsKey("result_amount")    ? (int)     rawTrade.get("result_amount")                      : 1;
-            int maxUses         = rawTrade.containsKey("max_uses")         ? (int)     rawTrade.get("max_uses")                           : 2147483647;
-            boolean expReward   = rawTrade.containsKey("exp_reward")       ? (boolean) rawTrade.get("exp_reward")                         : false;
-            int villagerExp     = rawTrade.containsKey("villager_exp")     ? (int)     rawTrade.get("villager_exp")                       : 0;
-            float priceMultiply = rawTrade.containsKey("price_multiplier") ? ((Number) rawTrade.get("price_multiplier")).floatValue()      : 0.0f;
-            int demand          = rawTrade.containsKey("demand")           ? (int)     rawTrade.get("demand")                             : 0;
-            int specialPrice    = rawTrade.containsKey("special_price")    ? (int)     rawTrade.get("special_price")                      : 0;
-            boolean ignoreDisc  = rawTrade.containsKey("ignore_discounts") ? (boolean) rawTrade.get("ignore_discounts")                   : true;
-
+            int resultAmount = rawTrade.containsKey("result_amount") ? (int) rawTrade.get("result_amount") : 1;
+            int maxUses = rawTrade.containsKey("max_uses") ? (int) rawTrade.get("max_uses") : 2147483647;
+            boolean expReward = rawTrade.containsKey("exp_reward") && (boolean) rawTrade.get("exp_reward");
+            int villagerExp = rawTrade.containsKey("villager_exp") ? (int) rawTrade.get("villager_exp") : 0;
+            float priceMultiply = rawTrade.containsKey("price_multiplier") ? ((Number) rawTrade.get("price_multiplier")).floatValue() : 0.0f;
+            int demand = rawTrade.containsKey("demand") ? (int) rawTrade.get("demand") : 0;
+            int specialPrice = rawTrade.containsKey("special_price") ? (int) rawTrade.get("special_price") : 0;
+            boolean ignoreDisc = !rawTrade.containsKey("ignore_discounts") || (boolean) rawTrade.get("ignore_discounts");
 
             ItemStack resultItem;
             if (rawTrade.containsKey("result_key")) {
